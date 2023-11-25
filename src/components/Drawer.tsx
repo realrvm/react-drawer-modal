@@ -1,5 +1,4 @@
 import { FC, ReactNode, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
 
 import { Mods, cn, createPortalRoot } from "../helpers";
 import {
@@ -7,6 +6,7 @@ import {
   useMountTransition,
   usePreventScroll,
 } from "../hooks";
+import { Portal } from "./Portal";
 
 import styles from "./Drawer.module.css";
 
@@ -14,8 +14,8 @@ type DrawerProps = {
   isOpen: boolean;
   children: ReactNode;
   onClose: () => void;
-  position?: "left" | "right" | "top" | "bottom";
   removeWhenClosed?: boolean;
+  position?: "left" | "right" | "top" | "bottom";
   className?: string;
 };
 
@@ -65,16 +65,21 @@ export const Drawer: FC<DrawerProps> = ({
     [styles.in]: isTransitioning,
   };
 
-  return createPortal(
-    <div
-      aria-hidden={isOpen ? "false" : "true"}
-      className={cn(styles.drawer_container, mods, [className])}
-    >
-      <div className={cn(styles.drawer, {}, [styles[position]])} role="dialog">
-        {children}
+  return (
+    <Portal element={portalRootRef.current}>
+      <div
+        aria-hidden={isOpen ? "false" : "true"}
+        className={cn(styles.drawer_container, mods, [className])}
+      >
+        <div
+          className={cn(styles.drawer, {}, [styles[position]])}
+          role="dialog"
+        >
+          {children}
+        </div>
+        <div className={styles.backdrop} onClick={onClose} />
       </div>
-      <div className={styles.backdrop} onClick={onClose} />
-    </div>,
-    portalRootRef.current,
+      , portalRootRef.current, );
+    </Portal>
   );
 };

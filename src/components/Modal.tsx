@@ -1,5 +1,4 @@
 import { FC, ReactNode, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
 
 import { Mods, cn, createPortalRoot } from "../helpers";
 
@@ -10,6 +9,7 @@ import {
 } from "../hooks";
 
 import styles from "./Modal.module.css";
+import { Portal } from "./Portal";
 
 type ModalProps = {
   isOpen: boolean;
@@ -64,16 +64,17 @@ export const Modal: FC<ModalProps> = ({
     [styles.in]: isTransitioning,
   };
 
-  return createPortal(
-    <div
-      aria-hidden={isOpen ? "false" : "true"}
-      className={styles.modal_container}
-    >
-      <div className={cn(styles.modal, mods, [className])} role="dialog">
-        {children}
+  return (
+    <Portal element={portalRootRef.current}>
+      <div
+        aria-hidden={isOpen ? "false" : "true"}
+        className={styles.modal_container}
+      >
+        <div className={cn(styles.modal, mods, [className])} role="dialog">
+          {children}
+        </div>
+        <div className={styles.backdrop} onClick={onClose} />
       </div>
-      <div className={styles.backdrop} onClick={onClose} />
-    </div>,
-    portalRootRef.current,
+    </Portal>
   );
 };
